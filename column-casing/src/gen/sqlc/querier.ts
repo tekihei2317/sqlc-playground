@@ -22,29 +22,6 @@ export async function getAllUsers(
     .all<GetAllUsersRow>();
 }
 
-const createUserQuery = `-- name: CreateUser :one
-insert into User (screenname) values (?) returning id, screenname, createdat`;
-
-export type CreateUserParams = {
-  screenname: string;
-};
-
-export type CreateUserRow = {
-  id: number;
-  screenname: string;
-  createdat: string;
-};
-
-export async function createUser(
-  d1: D1Database,
-  args: CreateUserParams
-): Promise<CreateUserRow | null> {
-  return await d1
-    .prepare(createUserQuery)
-    .bind(args.screenname)
-    .first<CreateUserRow | null>();
-}
-
 const getAllUsersSnakeQuery = `-- name: GetAllUsersSnake :many
 select id, screen_name, created_at from users`;
 
@@ -108,5 +85,69 @@ export async function createUserSnake(
       screenName: raw.screen_name,
       createdAt: raw.created_at,
     } : null);
+}
+
+const getUserByScreenNameQuery = `-- name: GetUserByScreenName :many
+select id, screenname, createdat from User where screenName = ?`;
+
+export type GetUserByScreenNameParams = {
+  screenname: string;
+};
+
+export type GetUserByScreenNameRow = {
+  id: number;
+  screenname: string;
+  createdat: string;
+};
+
+export async function getUserByScreenName(
+  d1: D1Database,
+  args: GetUserByScreenNameParams
+): Promise<D1Result<GetUserByScreenNameRow>> {
+  return await d1
+    .prepare(getUserByScreenNameQuery)
+    .bind(args.screenname)
+    .all<GetUserByScreenNameRow>();
+}
+
+const deleteUserByScreenNameQuery = `-- name: DeleteUserByScreenName :exec
+delete from User
+where screenName = ?`;
+
+export type DeleteUserByScreenNameParams = {
+  screenname: string;
+};
+
+export async function deleteUserByScreenName(
+  d1: D1Database,
+  args: DeleteUserByScreenNameParams
+): Promise<D1Result> {
+  return await d1
+    .prepare(deleteUserByScreenNameQuery)
+    .bind(args.screenname)
+    .run();
+}
+
+const createUserQuery = `-- name: CreateUser :one
+insert into User (screenname) values (?) returning id, screenname, createdat`;
+
+export type CreateUserParams = {
+  screenname: string;
+};
+
+export type CreateUserRow = {
+  id: number;
+  screenname: string;
+  createdat: string;
+};
+
+export async function createUser(
+  d1: D1Database,
+  args: CreateUserParams
+): Promise<CreateUserRow | null> {
+  return await d1
+    .prepare(createUserQuery)
+    .bind(args.screenname)
+    .first<CreateUserRow | null>();
 }
 

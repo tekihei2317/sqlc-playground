@@ -9,6 +9,7 @@ sql:
     schema: schema.sql
     queries:
       - query.sql
+      # - query-error.sql
     codegen:
       - out: src/gen/sqlc
         plugin: typescript-d1
