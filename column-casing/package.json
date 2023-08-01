@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "generate": "sqlc generate",
+    "migrate": "wrangler d1 migrations apply column-casing --local"
+  }
+}
